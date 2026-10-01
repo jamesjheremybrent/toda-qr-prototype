@@ -131,25 +131,6 @@
             border-color: var(--primary);
         }
 
-        .age-result {
-            margin-top: 18px;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            background: #ccfbf1;
-            color: var(--primary-dark);
-        }
-
-        .age-result p {
-            margin: 0 0 8px;
-        }
-
-        #ageDisplay {
-            margin: 0;
-            font-size: 32px;
-            font-weight: bold;
-        }
-
         .fare-table {
             width: 100%;
             border-collapse: collapse;
@@ -268,37 +249,6 @@
         </section>
 
         <section class="card">
-            <p class="section-label">PASSENGER AGE TOOL</p>
-            <h2>Birthday and Age</h2>
-
-            <div class="input-grid">
-                <div>
-                    <label for="memberSelect">Name</label>
-
-                    <select id="memberSelect">
-                        <option value="">
-                            -- Select a name --
-                        </option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="birthdayInput">Birthday</label>
-
-                    <input
-                        id="birthdayInput"
-                        type="date"
-                    >
-                </div>
-            </div>
-
-            <div class="age-result">
-                <p>Current Age</p>
-                <p id="ageDisplay">--</p>
-            </div>
-        </section>
-
-        <section class="card">
             <p class="section-label">OFFICIAL FARE MATRIX</p>
             <h2>Fare Information</h2>
 
@@ -370,21 +320,6 @@
             }
         ];
 
-        const groupMembers = [
-            {
-                name: "James Jeremy Brent",
-                birthday: "2006-01-08"
-            },
-            {
-                name: "Jillian Rose O. Formeleza",
-                birthday: "2006-06-26"
-            },
-            {
-                name: "Irene A. Miranda",
-                birthday: "2006-06-22"
-            }
-        ];
-
         const fareMatrix = {
             version: "Prototype 2026.01",
             effectiveDate: "October 1, 2026",
@@ -412,15 +347,6 @@
 
         const selectedDriverId =
             urlParameters.get("driver") || "TRIKE-102";
-
-        const memberSelect =
-            document.getElementById("memberSelect");
-
-        const birthdayInput =
-            document.getElementById("birthdayInput");
-
-        const ageDisplay =
-            document.getElementById("ageDisplay");
 
         const connectionStatus =
             document.getElementById("connectionStatus");
@@ -463,18 +389,6 @@
                 "This profile was loaded using the driver ID in the QR code.";
         }
 
-        function loadMembers() {
-            groupMembers.forEach(function(member, index) {
-                const option =
-                    document.createElement("option");
-
-                option.value = index;
-                option.textContent = member.name;
-
-                memberSelect.appendChild(option);
-            });
-        }
-
         function loadFareMatrix() {
             document.getElementById("fareVersion")
                 .textContent = fareMatrix.version;
@@ -499,48 +413,6 @@
             });
         }
 
-        function calculateAge(birthdayValue) {
-            if (!birthdayValue) {
-                return null;
-            }
-
-            const today = new Date();
-            const birthday =
-                new Date(birthdayValue + "T00:00:00");
-
-            let age =
-                today.getFullYear() -
-                birthday.getFullYear();
-
-            const birthdayNotYetReached =
-                today.getMonth() < birthday.getMonth()
-                ||
-                (
-                    today.getMonth() === birthday.getMonth()
-                    &&
-                    today.getDate() < birthday.getDate()
-                );
-
-            if (birthdayNotYetReached) {
-                age--;
-            }
-
-            return age;
-        }
-
-        function updateAge() {
-            const age =
-                calculateAge(birthdayInput.value);
-
-            if (age === null) {
-                ageDisplay.textContent = "--";
-                return;
-            }
-
-            ageDisplay.textContent =
-                age + " years old";
-        }
-
         function updateConnectionStatus() {
             if (navigator.onLine) {
                 connectionStatus.textContent =
@@ -562,27 +434,6 @@
                     "#92400e";
             }
         }
-
-        memberSelect.addEventListener("change", function() {
-            const selectedIndex =
-                memberSelect.value;
-
-            if (selectedIndex === "") {
-                birthdayInput.value = "";
-                ageDisplay.textContent = "--";
-                return;
-            }
-
-            birthdayInput.value =
-                groupMembers[selectedIndex].birthday;
-
-            updateAge();
-        });
-
-        birthdayInput.addEventListener(
-            "change",
-            updateAge
-        );
 
         const feedbackButton =
             document.getElementById("feedbackButton");
@@ -613,7 +464,6 @@
         }
 
         loadDriver();
-        loadMembers();
         loadFareMatrix();
         updateConnectionStatus();
 
