@@ -1,0 +1,8 @@
+{
+    "name": "TODA Passenger Information",
+    "short_name": "TODA Info",
+    "start_url": "./?driver=TRIKE-102",
+    "display": "browser",
+    "background_color": "#f0fdfa",
+    "theme_color": "#0f766e"
+}

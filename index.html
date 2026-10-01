@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TODA Passenger Information</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --background: #f0fdfa;
+            --card: #ffffff;
+            --text: #17202a;
+            --muted: #64748b;
+            --border: #cbd5e1;
+            --success: #15803d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        header {
+            padding: 25px 18px;
+            color: white;
+            background: linear-gradient(
+                135deg,
+                var(--primary-dark),
+                var(--primary)
+            );
+        }
+
+        header h1 {
+            margin: 6px 0;
+            font-size: 27px;
+        }
+
+        header p {
+            margin: 4px 0;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .container {
+            width: min(760px, 100%);
+            margin: auto;
+            padding: 18px;
+        }
+
+        .card {
+            margin-bottom: 18px;
+            padding: 22px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(15, 118, 110, 0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: var(--primary-dark);
+        }
+
+        .section-label {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .profile-grid,
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .profile-item {
+            padding: 13px;
+            border-radius: 9px;
+            background: #f8fafc;
+        }
+
+        .profile-item small {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--muted);
+        }
+
+        label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: white;
+            font-size: 16px;
+        }
+
+        select:focus,
+        input:focus {
+            outline: 3px solid #99f6e4;
+            border-color: var(--primary);
+        }
+
+        .age-result {
+            margin-top: 18px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            background: #ccfbf1;
+            color: var(--primary-dark);
+        }
+
+        .age-result p {
+            margin: 0 0 8px;
+        }
+
+        #ageDisplay {
+            margin: 0;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .fare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .fare-table th,
+        .fare-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .fare-table th {
+            color: var(--primary-dark);
+        }
+
+        .primary-button,
+        .feedback-button {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px;
+            border: 0;
+            border-radius: 9px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .primary-button {
+            background: var(--primary);
+        }
+
+        .feedback-button {
+            display: block;
+            background: #2563eb;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .primary-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .feedback-button:hover {
+            background: #1d4ed8;
+        }
+
+        .message {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        footer {
+            padding: 20px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .profile-grid,
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fare-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <p>QR-ACCESSIBLE TODA SYSTEM</p>
+        <h1>TODA Passenger Information</h1>
+        <p>Driver information, fare matrix, and passenger tools</p>
+
+        <span id="connectionStatus" class="status">
+            Checking connection...
+        </span>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <p class="section-label">DRIVER INFORMATION</p>
+            <h2 id="driverTitle">Loading driver...</h2>
+
+            <div class="profile-grid">
+                <div class="profile-item">
+                    <small>Driver Name</small>
+                    <strong id="driverName">Loading...</strong>
+                </div>
+
+                <div class="profile-item">
+                    <small>Body Number</small>
+                    <strong id="bodyNumber">Loading...</strong>
+                </div>
+
+                <div class="profile-item">
+                    <small>TODA Association</small>
+                    <strong id="todaName">Loading...</strong>
+                </div>
+
+                <div class="profile-item">
+                    <small>Franchise Status</small>
+                    <strong id="franchiseStatus">Loading...</strong>
+                </div>
+            </div>
+
+            <p id="driverMessage" class="message"></p>
+        </section>
+
+        <section class="card">
+            <p class="section-label">PASSENGER AGE TOOL</p>
+            <h2>Birthday and Age</h2>
+
+            <div class="input-grid">
+                <div>
+                    <label for="memberSelect">Name</label>
+
+                    <select id="memberSelect">
+                        <option value="">
+                            -- Select a name --
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="birthdayInput">Birthday</label>
+
+                    <input
+                        id="birthdayInput"
+                        type="date"
+                    >
+                </div>
+            </div>
+
+            <div class="age-result">
+                <p>Current Age</p>
+                <p id="ageDisplay">--</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <p class="section-label">OFFICIAL FARE MATRIX</p>
+            <h2>Fare Information</h2>
+
+            <p>
+                Fare Matrix Version:
+                <strong id="fareVersion">Loading...</strong>
+            </p>
+
+            <p>
+                Effective Date:
+                <strong id="effectiveDate">Loading...</strong>
+            </p>
+
+            <table class="fare-table">
+                <thead>
+                    <tr>
+                        <th>Route</th>
+                        <th>Regular</th>
+                        <th>Special</th>
+                    </tr>
+                </thead>
+
+                <tbody id="fareTableBody"></tbody>
+            </table>
+        </section>
+
+        <section class="card">
+            <p class="section-label">PASSENGER FEEDBACK</p>
+            <h2>Submit Feedback</h2>
+
+            <p class="message">
+                Feedback requires an Internet connection and will open
+                the official Google Form.
+            </p>
+
+            <a
+                id="feedbackButton"
+                class="feedback-button"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfWmxQvbSEJ0iaLyPHifEBUrNbvgf5oSh_cXK3nQ_PYTVUheg/viewform"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Open Feedback Form
+            </a>
+
+            <p id="feedbackMessage" class="message"></p>
+        </section>
+    </main>
+
+    <footer>
+        Prototype system for academic presentation
+    </footer>
+
+    <script>
+        const drivers = [
+            {
+                id: "TRIKE-102",
+                name: "James Jeremy Brent",
+                bodyNumber: "TRIKE-102",
+                toda: "Central TODA",
+                franchiseStatus: "Verified"
+            },
+            {
+                id: "TRIKE-103",
+                name: "Jillian Rose Formeleza",
+                bodyNumber: "TRIKE-103",
+                toda: "Central TODA",
+                franchiseStatus: "Verified"
+            }
+        ];
+
+        const groupMembers = [
+            {
+                name: "James Jeremy Brent",
+                birthday: "2006-01-08"
+            },
+            {
+                name: "Jillian Rose O. Formeleza",
+                birthday: "2006-06-26"
+            },
+            {
+                name: "Irene A. Miranda",
+                birthday: "2006-06-22"
+            }
+        ];
+
+        const fareMatrix = {
+            version: "Prototype 2026.01",
+            effectiveDate: "October 1, 2026",
+            routes: [
+                {
+                    route: "Public Market → State University",
+                    regular: "₱15.00",
+                    special: "₱60.00"
+                },
+                {
+                    route: "Bus Terminal → Municipal Hospital",
+                    regular: "₱20.00",
+                    special: "₱70.00"
+                },
+                {
+                    route: "Barangay Hall → Town Center",
+                    regular: "₱18.00",
+                    special: "₱65.00"
+                }
+            ]
+        };
+
+        const urlParameters =
+            new URLSearchParams(window.location.search);
+
+        const selectedDriverId =
+            urlParameters.get("driver") || "TRIKE-102";
+
+        const memberSelect =
+            document.getElementById("memberSelect");
+
+        const birthdayInput =
+            document.getElementById("birthdayInput");
+
+        const ageDisplay =
+            document.getElementById("ageDisplay");
+
+        const connectionStatus =
+            document.getElementById("connectionStatus");
+
+        function loadDriver() {
+            const driver =
+                drivers.find(function(item) {
+                    return item.id === selectedDriverId;
+                });
+
+            if (!driver) {
+                document.getElementById("driverTitle")
+                    .textContent = "Driver not found";
+
+                document.getElementById("driverMessage")
+                    .textContent =
+                    "The QR code contains an unknown driver ID.";
+
+                return;
+            }
+
+            document.getElementById("driverTitle")
+                .textContent =
+                "Driver Profile: " + driver.bodyNumber;
+
+            document.getElementById("driverName")
+                .textContent = driver.name;
+
+            document.getElementById("bodyNumber")
+                .textContent = driver.bodyNumber;
+
+            document.getElementById("todaName")
+                .textContent = driver.toda;
+
+            document.getElementById("franchiseStatus")
+                .textContent = driver.franchiseStatus;
+
+            document.getElementById("driverMessage")
+                .textContent =
+                "This profile was loaded using the driver ID in the QR code.";
+        }
+
+        function loadMembers() {
+            groupMembers.forEach(function(member, index) {
+                const option =
+                    document.createElement("option");
+
+                option.value = index;
+                option.textContent = member.name;
+
+                memberSelect.appendChild(option);
+            });
+        }
+
+        function loadFareMatrix() {
+            document.getElementById("fareVersion")
+                .textContent = fareMatrix.version;
+
+            document.getElementById("effectiveDate")
+                .textContent = fareMatrix.effectiveDate;
+
+            const tableBody =
+                document.getElementById("fareTableBody");
+
+            fareMatrix.routes.forEach(function(route) {
+                const row =
+                    document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${route.route}</td>
+                    <td>${route.regular}</td>
+                    <td>${route.special}</td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function calculateAge(birthdayValue) {
+            if (!birthdayValue) {
+                return null;
+            }
+
+            const today = new Date();
+            const birthday =
+                new Date(birthdayValue + "T00:00:00");
+
+            let age =
+                today.getFullYear() -
+                birthday.getFullYear();
+
+            const birthdayNotYetReached =
+                today.getMonth() < birthday.getMonth()
+                ||
+                (
+                    today.getMonth() === birthday.getMonth()
+                    &&
+                    today.getDate() < birthday.getDate()
+                );
+
+            if (birthdayNotYetReached) {
+                age--;
+            }
+
+            return age;
+        }
+
+        function updateAge() {
+            const age =
+                calculateAge(birthdayInput.value);
+
+            if (age === null) {
+                ageDisplay.textContent = "--";
+                return;
+            }
+
+            ageDisplay.textContent =
+                age + " years old";
+        }
+
+        function updateConnectionStatus() {
+            if (navigator.onLine) {
+                connectionStatus.textContent =
+                    "Internet available";
+
+                connectionStatus.style.background =
+                    "#dcfce7";
+
+                connectionStatus.style.color =
+                    "#166534";
+            } else {
+                connectionStatus.textContent =
+                    "Offline mode";
+
+                connectionStatus.style.background =
+                    "#fef3c7";
+
+                connectionStatus.style.color =
+                    "#92400e";
+            }
+        }
+
+        memberSelect.addEventListener("change", function() {
+            const selectedIndex =
+                memberSelect.value;
+
+            if (selectedIndex === "") {
+                birthdayInput.value = "";
+                ageDisplay.textContent = "--";
+                return;
+            }
+
+            birthdayInput.value =
+                groupMembers[selectedIndex].birthday;
+
+            updateAge();
+        });
+
+        birthdayInput.addEventListener(
+            "change",
+            updateAge
+        );
+
+        const feedbackButton =
+            document.getElementById("feedbackButton");
+
+        const feedbackMessage =
+            document.getElementById("feedbackMessage");
+
+        feedbackButton.addEventListener("click", function(event) {
+            if (!navigator.onLine) {
+                event.preventDefault();
+
+                feedbackMessage.textContent =
+                    "Internet is required to submit feedback.";
+
+                feedbackMessage.style.color = "#b45309";
+                return;
+            }
+
+            feedbackMessage.textContent = "";
+        });
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function() {
+                navigator.serviceWorker.register(
+                    "./service-worker.js"
+                );
+            });
+        }
+
+        loadDriver();
+        loadMembers();
+        loadFareMatrix();
+        updateConnectionStatus();
+
+        window.addEventListener(
+            "online",
+            updateConnectionStatus
+        );
+
+        window.addEventListener(
+            "offline",
+            updateConnectionStatus
+        );
+    </script>
+</body>
+</html>
